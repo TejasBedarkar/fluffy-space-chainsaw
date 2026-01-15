@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+python-multipart
+python-dotenv
+python-pptx
+pdf2image
+supabase
+livekit-agents
+livekit-plugins-google
+livekit-plugins-anam
+google-generativeai
