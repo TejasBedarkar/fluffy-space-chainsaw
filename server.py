@@ -25,10 +25,10 @@ logger = logging.getLogger('ppt-backend')
 
 app = FastAPI()
 
-# 1. CORS Setup (Allow Frontend to talk to Backend)
+# 1. CORS Setup (CRITICAL FIX: Allow All Origins)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, replace with your Vercel URL
+    allow_origins=["*"],  # Allows Codespaces, Vercel, and Localhost
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -40,7 +40,6 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 if not SUPABASE_URL or not SUPABASE_KEY:
     logger.error("❌ Missing Supabase Keys in .env")
-    # We continue, but DB operations will fail
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY) if SUPABASE_URL and SUPABASE_KEY else None
 
@@ -68,7 +67,6 @@ def process_ppt_task(file_path: str, presentation_id: str):
             }).execute()
 
         # B. Convert to PDF (LibreOffice)
-        # Note: In Codespaces/Linux, 'libreoffice' must be installed via apt-get
         cmd = [
             "libreoffice", "--headless", "--invisible", "--nodefault", "--nofirststartwizard",
             "--convert-to", "pdf",
@@ -159,11 +157,9 @@ async def upload_ppt(
     safe_filename = secure_filename(file.filename)
     save_path = os.path.join(UPLOAD_FOLDER, safe_filename)
 
-    # Save UploadFile to disk
     with open(save_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    # Add processing to background task (FastAPI handles the thread)
     background_tasks.add_task(process_ppt_task, save_path, presentation_id)
 
     return {
