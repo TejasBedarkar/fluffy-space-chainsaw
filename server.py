@@ -194,3 +194,4 @@ def connection_details():
         "roomName": room_name,
         "participantToken": token
     }
+    }
