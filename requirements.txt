@@ -10,3 +10,4 @@ livekit-plugins-google
 livekit-plugins-anam
 google-generativeai
 werkzeug
+
